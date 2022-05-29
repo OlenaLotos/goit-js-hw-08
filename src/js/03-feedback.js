@@ -1,40 +1,39 @@
-
-import throttle from 'lodash.throttle';
+import throttle from "lodash.throttle";
+const form = document.querySelector('.feedback-form');
+const email = document.querySelector('input');
+const message = document.querySelector('textarea');
 const STORAGE_KEY = 'feedback-form-state';
-let dataStorage = {};
-const refs =
-{
-  form: document.querySelector('.feedback-form'),
-  email: document.querySelector('input'),
-  textarea: document.querySelector('textarea'),
+
+form.addEventListener('input', throttle(onTextRead, 500));
+form.addEventListener('submit', onFormSubmit);
+
+function onTextRead(event) {
+  const dataStorage = {
+    email: email.value,
+    message: message.value,
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(dataStorage));
 };
+
+function onFormSubmit(event) {
+  event.preventDefault();
+  console.log(localStorage.getItem(STORAGE_KEY));
+  localStorage.removeItem(STORAGE_KEY);
+  form.reset();
+}
+
 savedTextArea();
 
-refs.form.addEventListener('submit', onFormSubmit);
-addEventListener('DOMContentLoaded', savedTextArea);
-refs.form.addEventListener('input', throttle(onInputExist, 500));
+// function savedTextArea() {
+//   const savedMessage = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+//   email.value = savedMessage.email || "";
+//   message.value = savedMessage.message || "";
+//   const newStorage = JSON.stringify(savedMessage);
+//   localStorage.setItem(STORAGE_KEY, newStorage);
+// };
 
-function onInputExist(evt) {
-  evt.preventDefault();
-  dataStorage = JSON.parse(localStorage.getItem(STORAGE_KEY));
-  dataStorage[evt.target.name] = evt.target.value;
-}
-
-localStorage.setItem(STORAGE_KEY, JSON.stringify(dataStorage));
-
-function onFormSubmit(evt) {
-  evt.preventDefault();
-  console.log(JSON.parse(localStorage.getItem(STORAGE_KEY)));
-  evt.currentTarget.reset();
-  localStorage.removeItem(STORAGE_KEY);
-}
 function savedTextArea() {
-  const savedMessage = localStorage.getItem(STORAGE_KEY);
-  const parsedMessage = savedMessage ? JSON.parse(savedMessage) : {};
-  refs.email.value = parsedMessage.email || '';
-  refs.textarea.value = parsedMessage.message || '';
-  const updatedMessage = JSON.stringify(parsedMessage);
-  localStorage.setItem(STORAGE_KEY, updatedMessage);
-}
-
-
+  const savedMessage = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  email.value = savedMessage.email || '';
+  message.value = savedMessage.message || '';
+};
